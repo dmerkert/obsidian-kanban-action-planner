@@ -1066,3 +1066,11 @@ Markdown)`, `Export ideal week (JSON)`, `Export ideal week (Markdown)`); the for
     resolves a remembered or embedded (`mode=`) disabled mode to the board, and `setViewMode`
     (commands included) refuses it with a notice naming the mode. Nothing is deleted: the
     view's flags stay, and re-enabling the mode brings the view back where it was.
+
+57. **Scheduled and due property names are global (owner decision; 2026-09-14).** The plugin
+    settings **Scheduled date property** and **Due date property** are the single source of truth
+    for Calendar, Timeline, WBS, Ideal week, Agenda, card due/countdown display, filters, and the
+    shared card-menu date actions. Every consumer reads and writes the same resolved names. Legacy
+    `scheduledDateProperty` / `dueDateProperty` keys in `.base` files and copied values in stored
+    note-type calendar snapshots are ignored; changing either setting refreshes open views and
+    never migrates or rewrites note frontmatter.

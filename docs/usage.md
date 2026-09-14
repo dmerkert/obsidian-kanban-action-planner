@@ -1124,8 +1124,9 @@ command), or embed it with `mode=ideal-week` (`mode=week` works too).
   type's status configuration (mirrored from the Obsidian Starter Kit; without roles, every
   non-done status counts) **and** that carries the **time blocks** property (`time_blocks`
   by default; an empty list is enough, an absent property keeps the note out, and tasks stay in
-  calendar and agenda modes). A note with a start and a due date (a project's `date_started`
-  and `date_due`) is part of the ideal week only while today lies between them.
+  calendar and agenda modes). A note with values in the globally configured **Scheduled date
+  property** and **Due date property** is part of the ideal week only while today lies between
+  them.
 - **The rail** on the left lists **every** note of the board that carries the time blocks
   property, whatever its status: a **Not planned yet** section and a **Planned** one, each
   **grouped by status** (collapsible headers in column order), every note with its planned

@@ -221,6 +221,10 @@ properties (their names are set in plugin settings) and writes them when you dra
 | Scheduled date | `date_scheduled` | The **Unplanned** tab + the calendar's scheduled day. |
 | Due date       | `date_due`       | The **No deadline** tab + the calendar's due day.     |
 
+These two settings are shared by Calendar, Timeline, WBS, Ideal week, Agenda, date filters, card
+countdowns, and the date actions in card menus. Changing a name affects both reads and future
+writes everywhere; the plugin does not rename or migrate existing frontmatter properties.
+
 Dates are parsed leniently (a `YYYY-MM-DD` or full date string, or a real date value) and
 written with the note type's momentjs **date format** (default `YYYY-MM-DD`). The calendar's
 default **range** (week/month/quarter/year) and the **panel sort** (manual order / name /
@@ -243,6 +247,9 @@ one whole day on the chart. Per view, **Configure view → Timeline** only sets 
 range** (Quarter by default). Estimates are written as plain numbers in the note's own unit;
 fractional day values round up to whole days, minimum 1. Old per-view
 start/estimate/end/milestone keys in a `.base` file are ignored.
+
+> **Development transparency:** The custom scheduled/due property resolution fix, its tests, and
+> this documentation were created by OpenAI Codex.
 
 ## WBS mode
 

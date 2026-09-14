@@ -37,6 +37,7 @@ import type {
 } from '../../domain/note-type'
 import { isDoneValue, resolveDoneConfig } from '../../domain/done'
 import type { ResolvedDoneConfig } from '../../domain/done'
+import { resolveDateProperties } from '../../domain/date-properties'
 import {
     dedupeRules,
     rawValuesEqual,
@@ -823,8 +824,8 @@ export class KanbanActionPlannerView extends BasesView implements HoverParent {
             showCardMenu: (card, event, extend) => this.showCardMenu(card, event, extend),
             cardForKey: (key) => this.cardsByKey.get(key),
             isActiveCard: (card) => this.isActiveCard(card),
-            startPropertyFor: (card) => this.datePropertiesFor(card).start,
-            duePropertyFor: (card) => this.datePropertiesFor(card).due,
+            startPropertyFor: () => this.dateProperties().start,
+            duePropertyFor: () => this.dateProperties().due,
             noteTypeFor: (card) => this.noteTypeByPath.get(card.key) ?? null,
             statusLabelFor: (card) => this.statusLabelFor(card),
             statusRankFor: (card) => {
@@ -1412,8 +1413,9 @@ export class KanbanActionPlannerView extends BasesView implements HoverParent {
         this.availableProperties = this.collectPropertyNames(files)
         this.statusProperty = this.resolveStatusProperty(files)
         this.orderProperty = this.resolveOrderProperty()
-        this.dueDateProperty = this.resolveDueDateProperty()
-        this.scheduledDateProperty = this.resolveScheduledDateProperty()
+        const dateProperties = resolveDateProperties(this.plugin.settings)
+        this.dueDateProperty = dateProperties.due
+        this.scheduledDateProperty = dateProperties.scheduled
         this.deferDateProperty = this.resolveDeferDateProperty()
 
         // Per-type resolution (mixed boards): each file's role properties,
@@ -2283,20 +2285,11 @@ export class KanbanActionPlannerView extends BasesView implements HoverParent {
         return card.statusValue !== null && active.includes(card.statusValue)
     }
 
-    /**
-     * The start (scheduled) and due date properties of a card's OWN type —
-     * a project's blocks apply between its `date_started` and `date_due`
-     * while an activity's type may name neither (issue #172).
-     */
-    private datePropertiesFor(card: KanbanCard): { start: string; due: string } {
-        const typeId = this.noteTypeByPath.get(card.key)?.id
-        const noteType = typeId ? findNoteType(this.plugin, typeId) : undefined
-        if (!noteType) return { start: this.scheduledDateProperty, due: this.dueDateProperty }
+    /** Shared plugin-wide start (scheduled) and due date properties. */
+    private dateProperties(): { start: string; due: string } {
         return {
-            start:
-                noteType.calendar.scheduledDateProperty ||
-                this.plugin.settings.defaultScheduledDateProperty,
-            due: noteType.calendar.dueDateProperty || this.plugin.settings.defaultDueDateProperty
+            start: this.scheduledDateProperty,
+            due: this.dueDateProperty
         }
     }
 
@@ -2439,17 +2432,16 @@ export class KanbanActionPlannerView extends BasesView implements HoverParent {
     }
 
     /**
-     * The card's lifecycle dates (issue #172, phase C). Started and due come
-     * from the card's type (its calendar start / due properties), done is
-     * the property the mirrored done status stamps (else the archive's
-     * done-date property), committed is the global setting.
+     * The card's lifecycle dates (issue #172, phase C). Started and due use
+     * the global scheduling properties, done is the property the mirrored
+     * done status stamps (else the archive's done-date property), and
+     * committed is the global setting.
      */
     private lifecycleDatesFor(card: KanbanCard): LifecycleDates {
         const read = (property: string | null): Date | null =>
             property ? parseDay(getFrontmatterValue(this.app, card.file, property)) : null
-        // Started / due follow the card's TYPE (its calendar config), like
-        // the week grid: a project's `date_started`, a task's scheduled date.
-        const dates = this.datePropertiesFor(card)
+        // Started / due use the same global names as every scheduling view.
+        const dates = this.dateProperties()
         return {
             committed: read(this.plugin.settings.committedDateProperty),
             started: read(dates.start),
@@ -2729,22 +2721,6 @@ export class KanbanActionPlannerView extends BasesView implements HoverParent {
         return (
             basesPropToName(this.viewConfig.get('orderProperty')) ??
             this.plugin.settings.defaultOrderProperty
-        )
-    }
-
-    private resolveDueDateProperty(): string {
-        return (
-            basesPropToName(this.viewConfig.get('dueDateProperty')) ??
-            this.noteType.calendar.dueDateProperty ??
-            this.plugin.settings.defaultDueDateProperty
-        )
-    }
-
-    private resolveScheduledDateProperty(): string {
-        return (
-            basesPropToName(this.viewConfig.get('scheduledDateProperty')) ??
-            this.noteType.calendar.scheduledDateProperty ??
-            this.plugin.settings.defaultScheduledDateProperty
         )
     }
 

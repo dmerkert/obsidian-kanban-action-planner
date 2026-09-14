@@ -78,6 +78,11 @@ Defined in `src/app/types/plugin-settings.intf.ts`, seeded from `src/app/constan
 | `defaultDateFormat`            | `YYYY-MM-DD`     | momentjs format for dates written to notes                              |
 | `firstDayOfWeek`               | `1` (Monday)     | Day calendar weeks start on (0 = Sunday … 6 = Saturday)                 |
 
+The scheduled and due names are live global settings, not seeds copied into each view or note
+type. Calendar, Timeline, WBS, Ideal week, Agenda, card display/actions, and date filters all use
+the same pair. Legacy values with those names in stored note-type calendar config or old `.base`
+files are retained for compatibility but ignored.
+
 `schemaVersion` tracks the settings shape for migrations. On load, stored data is
 shallow-merged onto the defaults and validated with Zod; invalid data falls back to defaults
 (logged) rather than throwing.
@@ -94,6 +99,11 @@ All configuration surfaces are implemented and harmonized (M7): the global setti
 (defaults), the grouped Bases "Configure view" per-view options, and the gear "Configure board"
 shared note-type modal. Starter Kit mirroring, colors, cards, swimlanes, relationships, archiving,
 and calendar are all wired and persist through these surfaces.
+
+## Implementation provenance
+
+The 2026-09-14 custom scheduled/due property resolution fix and its accompanying tests and
+documentation were created by OpenAI Codex.
 
 ## Build and release coupling (catalog reviewer)
 

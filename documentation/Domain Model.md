@@ -64,8 +64,10 @@ column rule.
   defer status-triggered archiving to a board-load sweep (`domain/archive-grace.ts`:
   `graceDecision` → `none` / `immediate` / `aged` / `stamp` / `wait`; rule 11); a type's own `graceDays` (mirrored from the Starter Kit's per-type delay) overrides the global value. When the Starter Kit (≥ 1.19) declares the type's archive, the whole block is a read-only mirror of it (`mirrored: true`, `reconcileArchive`). A namesake
   folder note moves with its folder (`planMove` in `services/archive.service.ts`).
-- **CalendarConfig** — scheduled/due date property names, momentjs `dateFormat`, default
-  range, and tab sort key. Calendar mode (per-view `calendarMode` toggle) is driven by pure
+- **CalendarConfig** — legacy scheduled/due snapshot fields (retained for stored-data
+  compatibility but not used for resolution), momentjs `dateFormat`, default range, and tab sort
+  key. The live scheduled/due names come from the two global plugin settings. Calendar mode
+  (per-view `calendarMode` toggle) is driven by pure
   helpers: `domain/calendar.ts` (`CalendarRange`, month/week grid building with a configurable
   **first day of week** — `startOfWeek`/`weekdayLabels` keyed off the global `firstDayOfWeek`
   setting, `parseFrontmatterDate`, `bucketByDay`, `shiftAnchor`, `addDays`, `formatLongDate`)
